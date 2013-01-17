@@ -1,0 +1,3 @@
+('WARNING: problems with charset recognition', "'\\x1b'")
+making a request
+{u'meta': {u'status': 200, u'msg': u'OK'}, u'response': {u'blog': {u'updated': 0, u'description': u'', u'title': u'One way ticket to Brazil', u'url': u'http://onewaytickettobrazil.tumblr.com/', u'share_likes': False, u'posts': 0, u'ask': False, u'name': u'onewaytickettobrazil'}, u'total_posts': 0, u'posts': []}}
