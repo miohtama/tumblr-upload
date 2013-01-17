@@ -1,17 +1,27 @@
+.. contents:: :local:
+
+Introduction
+----------------
+
 Mass upload a folder of photos as Tumblr posts. Give it a folder and it will create Tumblr posts
 from the photos. The same photo is not uploaded twice.
 
-Use JPEG EXIF metadata description as post title or post description.
+Use JPEG EXIF and IPTC (Google Picasa) metadata description as post title or post description.
 It uses `Natural Language Toolkit <http://www.nltk.org/>`_ for extracting sentences and stuff.
 
 
-Usage::
+Usage
+------
 
-    git clone ...
+
+Install::
+
+    git clone git://github.com/miohtama/tumblr-upload.git
     cd tumbrl-upload
     virtualenv venv
     . venv/bin/activate
-    easy_install oauth2 tumblr2 nltk poster
+    easy_install oauth2 nltk poster
+    pip install https://github.com/miohtama/tumblr-python/tarball/master
 
 Login to Tumblr.
 
@@ -46,3 +56,7 @@ Links
 -------
 
 * https://github.com/medecau/tumblr-python
+
+* https://gist.github.com/1242662
+
+* http://www.tumblr.com/docs/en/api/v2#posting
