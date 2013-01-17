@@ -40,6 +40,7 @@ def get_photo_title_and_description(path):
     """
     info = IPTCInfo(path)
 
+    title = os.path.basename(path)
     desc = info.data['caption/abstract']
 
     if not desc:
@@ -53,16 +54,19 @@ def get_photo_title_and_description(path):
 
     desc = desc.decode("utf-8")
 
+    return title, desc
+
+    # Split desc to title and description using natural language processing
     # http://stackoverflow.com/a/4576110/315168
-    sentences = tokenizer.tokenize(desc)
+    # sentences = tokenizer.tokenize(desc)
 
-    for s in sentences:
-        print s.encode("utf-8")
+    # for s in sentences:
+    #     print s.encode("utf-8")
 
-    if len(sentences) >= 2:
-        return sentences[0], desc
-    else:
-        return sentences[0], ""
+    # if len(sentences) >= 2:
+    #     return sentences[0], desc
+    # else:
+    #     return sentences[0], ""
 
 
 def spoof_url(path):
@@ -155,6 +159,7 @@ for mdate, path in sorted(entries):
     # for photos.. only for text posts
     title, desc = get_photo_title_and_description(path)
     #response = tumblr.create_post(request_params={"type": "text", "body": "foobar"})
+    print desc
     response = tumblr.create_photo_post(path, request_params={"caption": desc})
     print response
     break
