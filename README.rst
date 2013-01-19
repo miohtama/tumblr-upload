@@ -3,16 +3,15 @@
 Introduction
 ----------------
 
-Mass upload a folder of photos as Tumblr posts. Give it a folder and it will create Tumblr posts
-from the photos. The same photo is not uploaded twice.
+``tumblr-upload`` mass uploads a folder of photos to Tumblr. Give it a folder and it will create Tumblr posts
+from the photos. Resuming is supported: the same photo is not uploaded twice.
+I created it for my little photo blogging project `One way ticket to Brazil <http://onewaytickettobrazil.tumblr.com/>`_.
 
-Use JPEG EXIF and IPTC (Google Picasa) metadata description as post title or post description.
-It uses `Natural Language Toolkit <http://www.nltk.org/>`_ for extracting sentences and stuff.
-
+It uses JPEG EXIF and IPTC (Google Picasa) metadata description as Tumblr post description,
+making it easy to pre-process images in Google Picasa desktop application for Tumblr upload.
 
 Installation
 --------------
-
 
 Install::
 
