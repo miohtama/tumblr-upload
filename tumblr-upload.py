@@ -149,7 +149,7 @@ def main():
 
     # Read extra photo description injection (the name of the place) from command line
     if len(sys.argv) > 2:
-        description_prefix = sys.argv[2]
+        description_prefix = sys.argv[2].decode("utf-8")
     else:
         description_prefix = None
 
