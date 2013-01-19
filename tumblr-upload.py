@@ -5,13 +5,20 @@
 """
 
 import sys
+
+import pdb ; pdb.set_trace()
+
 from stat import S_ISREG, ST_MODE, ST_MTIME
 import os
+import json
 
 import oauth2 as oauth
 from tumblr import TumblrClient
 import nltk.data
 from iptcinfo import IPTCInfo
+
+# Create this file in each folder to remember the made posts
+INDEX_FILENAME = "tumblr.index"
 
 # On demand install of NLTK data
 if not os.path.exists(os.path.join(os.environ["HOME"], "nltk_data")):
@@ -21,6 +28,51 @@ tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
 # Tumblr client instance
 tumblr = None
+
+
+class Index:
+    """
+    Keep a track file of posted photos per folder locally as
+    local image file -> tumblr post id mappings.
+
+    This way we do not post the same photo twice.
+    """
+
+    def __init__(self, path):
+        """
+        :param path: Path to the folder which images we track
+        """
+        self.path = path
+        self.data = None
+        self.load()
+
+    def load(self):
+        index_file = os.path.join(self.path, INDEX_FILENAME)
+        if os.path.exists(index_file):
+            f = open(index_file, "rt")
+            data = json.load(f)
+            f.close()
+            self.data = data
+        else:
+            self.data = {}
+
+    def save(self):
+        """
+        """
+        index_file = os.path.join(os.path.dirname(path), INDEX_FILENAME)
+        f = open(index_file, "wt")
+        json.dump(self.data, f)
+        f.close()
+
+    def is_already_posted(self, image_path):
+        """
+        """
+        return image_path in self.data
+
+    def update(self, image_path, id):
+        """
+        """
+        self.data[image_path] = id
 
 
 def get_photo_title_and_description(path):
@@ -69,48 +121,6 @@ def get_photo_title_and_description(path):
     #     return sentences[0], ""
 
 
-def spoof_url(path):
-    """
-    Create unique URL id for posts based on filename
-    """
-    return "file://" + os.path.basename(path)
-
-
-def post_photo(description, path):
-    """
-    We use filename as source URL that we get a proper unique id
-    to avoid double posting.
-    """
-    photo = open(path, 'rb')
-    tumblr.post('post',
-        blog_url=os.environ["BLOG"],
-        params={'type': 'photo',
-                'caption': description,
-                'data': photo,
-                'source': spoof_url(path)})
-
-
-def lister(client, count, params={}):
-    client.get_blog_posts()
-
-    total = 0
-    while True:
-        print "making a request"
-        params['offset'] = total
-        json_response = client.get_blog_posts(request_params=params)
-        print json_response
-        if not json_response:
-            break
-
-        if len(json_response['response']['posts']) == 0:
-            raise StopIteration
-
-        for post in json_response['response']['posts']:
-            total += 1
-            if total > count:
-                raise StopIteration
-            yield post
-
 # http://stackoverflow.com/a/539024/315168
 if not os.environ.get("KEY", None):
     sys.exit("Give app key as KEY env")
@@ -138,13 +148,26 @@ tumblr = TumblrClient(os.environ["BLOG"], consumer, token)
 # path to the directory (relative or absolute)
 dirpath = sys.argv[1] if len(sys.argv) == 2 else r'.'
 
+# Read extra photo description injection (the name of the place) from command line
+if len(sys.argv) > 2:
+    description_prefix = sys.argv[2]
+else:
+    description_prefix = None
+import pdb ; pdb.set_trace()
+
+index = Index(dirpath)
+
 # get all entries in the directory w/ stats
 entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
 entries = ((os.stat(path), path) for path in entries)
+entries = list(entries)
+entries.sort()
 
+# XXX: Currently we force Picasa album order by Picasa add filename prefix option
 # leave only regular files, insert creation date
-entries = ((stat[ST_MTIME], path)
-           for stat, path in entries if S_ISREG(stat[ST_MODE]))
+# entries = ((stat[ST_MTIME], path)
+#           for stat, path in entries if S_ISREG(stat[ST_MODE]))
+
 #NOTE: on Windows `ST_CTIME` is a creation date
 #  but on Unix it could be something else
 #NOTE: use `ST_MTIME` to sort by a modification date
@@ -158,13 +181,26 @@ for mdate, path in sorted(entries):
     # XXX: Currently Tumblr does not have separate title and description
     # for photos.. only for text posts
     title, desc = get_photo_title_and_description(path)
-    #response = tumblr.create_post(request_params={"type": "text", "body": "foobar"})
-    print desc
-    response = tumblr.create_photo_post(path, request_params={"caption": desc})
-    print response
-    break
 
-for post in lister(tumblr, 10, params={'type': 'photo'}):
-    print post['id']
+    if description_prefix:
+        desc = u"<em>%s.</em> %s" % (description_prefix, desc)
+    import ipdb ; ipdb.set_trace()
+
+    #response = tumblr.create_post(request_params={"type": "text", "body": "foobar"})
+
+    if not index.is_already_posted(path):
+        print "Posting %s: %s" % (path.encode("utf-8"), desc.encode("utf-8"))
+        response = tumblr.create_photo_post(path, request_params={"caption": desc})
+        response = json.loads(response)
+        if response["meta"]["status"] != 201:
+            print response
+            raise RuntimeError("Tumbrl unsuccesful")
+
+        tumblr_id = response["response"]["id"]
+        index.update(path, tumblr_id)
+        index.save()
+    else:
+        print "Already posted %s" % path.encode("utf-8")
+
 
 

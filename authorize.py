@@ -1,4 +1,4 @@
-"""
+    """
 
     Create command line authorization token.
 
@@ -44,7 +44,7 @@ KEY=%s \\
 SECRET=%s \\
 TOKEN=%s \\
 VERIFIER=%s \\
-python %s/tumblr-upload.py $1
+python %s/tumblr-upload.py $*
 """ % (pwd, os.environ["BLOG"], os.environ["KEY"], os.environ["SECRET"], final_oauth_token, final_oauth_token_secret, pwd)
 
 out.close()

@@ -52,6 +52,16 @@ Now you can upload a folderful of photos::
 
     ./upload.sh ~/Desktop/sushinight/Sao\ Paulo\ highlights\ 2/
 
+You can also add some prefix text to all photo captions::
+
+    ./upload.sh ~/Desktop/sushinight/copacabana "RIO DE JANEIRO"
+
+Troubleshooting
+------------------
+
+If you get 401 responses from Tumblr OAuth API your clock might be wrong time and
+timestamp check fails.
+
 Links
 -------
 
