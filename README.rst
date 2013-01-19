@@ -3,9 +3,9 @@
 Introduction
 ----------------
 
-``tumblr-upload`` mass uploads a folder of photos to Tumblr. Give it a folder and it will create Tumblr posts
+``tumblr-upload`` mass uploads a folder of photos to Tumblrgi. Give it a folder and it will create Tumblr posts
 from the photos. Resuming is supported: the same photo is not uploaded twice.
-I created it for my little photo blogging project `One way ticket to Brazil <http://onewaytickettobrazil.tumblr.com/>`_.
+I created it for my little photo blogging project `One way ticket to Brazil <http://onewaytickettobrazil.tumblr.com/>`_ (`in Twitter <https://twitter.com/1wayticket2braz>`_)
 
 It uses JPEG EXIF and IPTC (Google Picasa) metadata description as Tumblr post description,
 making it easy to pre-process images in Google Picasa desktop application for Tumblr upload.
@@ -19,7 +19,7 @@ Install::
     cd tumbrl-upload
     virtualenv venv
     . venv/bin/activate
-    easy_install oauth2 nltk poster
+    easy_install oauth2 nltk poster IPTCInfo
     pip install https://github.com/miohtama/tumblr-python/tarball/master
 
 Login to Tumblr.
@@ -83,6 +83,12 @@ Troubleshooting
 
 If you get 401 responses from Tumblr OAuth API your clock might be wrong time and
 timestamp check fails.
+
+Internals
+---------
+
+The script uses Oauth2, poster, tumblr-python, IPTCInfo and NLTK libraries
+to get the thing together.
 
 Links
 -------
