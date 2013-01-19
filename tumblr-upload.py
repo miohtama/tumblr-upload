@@ -9,6 +9,7 @@ import sys
 #from stat import S_ISREG, ST_MODE, ST_MTIME
 import os
 import json
+from urllib2 import HTTPError
 
 import oauth2 as oauth
 from tumblr import TumblrClient
@@ -181,7 +182,14 @@ def main():
 
         if not index.is_already_posted(path):
             print "Posting %s: %s" % (path.encode("utf-8"), desc.encode("utf-8"))
-            response = tumblr.create_photo_post(path, request_params={"caption": desc, "tags": tags})
+            try:
+                response = tumblr.create_photo_post(path, request_params={"caption": desc, "tags": tags})
+            except HTTPError, e:
+                # Some verbosity what the fusck is going on
+                # Usually '{"meta":{"status":400,"msg":"Bad Request"},"response":{"errors":["Oh no! You\'ve reached your photo upload limit for today. Please come again tomorrow!"]}}'
+                print e.read()
+                raise e
+
             response = json.loads(response)
             if response["meta"]["status"] != 201:
                 print response
