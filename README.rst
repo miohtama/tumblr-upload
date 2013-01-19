@@ -75,6 +75,10 @@ And then with tags::
 
     ./upload.sh ~/Desktop/sushinight/copacabana "RIO DE JANEIRO" "brazil, riodejaneiro"
 
+Because the blog keeps index file you can simply re-run the command and
+it will continue from the photo where it failed. And with
+Internet in Brazi, it will fail.
+
 Troubleshooting
 ------------------
 

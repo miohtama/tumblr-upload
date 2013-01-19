@@ -57,7 +57,7 @@ class Index:
     def save(self):
         """
         """
-        index_file = os.path.join(os.path.dirname(self.path), INDEX_FILENAME)
+        index_file = os.path.join(self.path, INDEX_FILENAME)
         f = open(index_file, "wt")
         json.dump(self.data, f)
         f.close()
