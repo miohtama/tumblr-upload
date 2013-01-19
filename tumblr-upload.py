@@ -6,9 +6,7 @@
 
 import sys
 
-import pdb ; pdb.set_trace()
-
-from stat import S_ISREG, ST_MODE, ST_MTIME
+#from stat import S_ISREG, ST_MODE, ST_MTIME
 import os
 import json
 
@@ -59,7 +57,7 @@ class Index:
     def save(self):
         """
         """
-        index_file = os.path.join(os.path.dirname(path), INDEX_FILENAME)
+        index_file = os.path.join(os.path.dirname(self.path), INDEX_FILENAME)
         f = open(index_file, "wt")
         json.dump(self.data, f)
         f.close()
@@ -121,86 +119,80 @@ def get_photo_title_and_description(path):
     #     return sentences[0], ""
 
 
-# http://stackoverflow.com/a/539024/315168
-if not os.environ.get("KEY", None):
-    sys.exit("Give app key as KEY env")
+def main():
 
-if not os.environ.get("SECRET", None):
-    sys.exit("Give app key as SECRET env")
+    # http://stackoverflow.com/a/539024/315168
+    if not os.environ.get("KEY", None):
+        sys.exit("Give app key as KEY env")
 
+    if not os.environ.get("SECRET", None):
+        sys.exit("Give app key as SECRET env")
 
-if not os.environ.get("TOKEN", None):
-    sys.exit("Give Oauth token as TOKEN env")
+    if not os.environ.get("TOKEN", None):
+        sys.exit("Give Oauth token as TOKEN env")
 
-if not os.environ.get("VERIFIER", None):
-    sys.exit("Give Oauth verifier as VERIFIER env")
+    if not os.environ.get("VERIFIER", None):
+        sys.exit("Give Oauth verifier as VERIFIER env")
 
-if not os.environ.get("BLOG", None):
-    sys.exit("Give blog URL as BLOG env")
+    if not os.environ.get("BLOG", None):
+        sys.exit("Give blog URL as BLOG env")
 
-# Create Tumblr client
+    # Create Tumblr client
 
-consumer = oauth.Consumer(os.environ["KEY"], os.environ["SECRET"])
-token = oauth.Token(os.environ["TOKEN"], os.environ["VERIFIER"])
+    consumer = oauth.Consumer(os.environ["KEY"], os.environ["SECRET"])
+    token = oauth.Token(os.environ["TOKEN"], os.environ["VERIFIER"])
 
-tumblr = TumblrClient(os.environ["BLOG"], consumer, token)
+    tumblr = TumblrClient(os.environ["BLOG"], consumer, token)
 
-# path to the directory (relative or absolute)
-dirpath = sys.argv[1] if len(sys.argv) == 2 else r'.'
+    # path to the directory (relative or absolute)
+    dirpath = sys.argv[1] if len(sys.argv) >= 2 else r'.'
 
-# Read extra photo description injection (the name of the place) from command line
-if len(sys.argv) > 2:
-    description_prefix = sys.argv[2]
-else:
-    description_prefix = None
-import pdb ; pdb.set_trace()
-
-index = Index(dirpath)
-
-# get all entries in the directory w/ stats
-entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
-entries = ((os.stat(path), path) for path in entries)
-entries = list(entries)
-entries.sort()
-
-# XXX: Currently we force Picasa album order by Picasa add filename prefix option
-# leave only regular files, insert creation date
-# entries = ((stat[ST_MTIME], path)
-#           for stat, path in entries if S_ISREG(stat[ST_MODE]))
-
-#NOTE: on Windows `ST_CTIME` is a creation date
-#  but on Unix it could be something else
-#NOTE: use `ST_MTIME` to sort by a modification date
-
-for mdate, path in sorted(entries):
-    root, ext = os.path.splitext(path)
-    if ext.lower() not in [".jpg", ".jpeg"]:
-        # Only consider images
-        continue
-
-    # XXX: Currently Tumblr does not have separate title and description
-    # for photos.. only for text posts
-    title, desc = get_photo_title_and_description(path)
-
-    if description_prefix:
-        desc = u"<em>%s.</em> %s" % (description_prefix, desc)
-    import ipdb ; ipdb.set_trace()
-
-    #response = tumblr.create_post(request_params={"type": "text", "body": "foobar"})
-
-    if not index.is_already_posted(path):
-        print "Posting %s: %s" % (path.encode("utf-8"), desc.encode("utf-8"))
-        response = tumblr.create_photo_post(path, request_params={"caption": desc})
-        response = json.loads(response)
-        if response["meta"]["status"] != 201:
-            print response
-            raise RuntimeError("Tumbrl unsuccesful")
-
-        tumblr_id = response["response"]["id"]
-        index.update(path, tumblr_id)
-        index.save()
+    # Read extra photo description injection (the name of the place) from command line
+    if len(sys.argv) > 2:
+        description_prefix = sys.argv[2]
     else:
-        print "Already posted %s" % path.encode("utf-8")
+        description_prefix = None
+
+    if len(sys.argv) > 3:
+        tags = sys.argv[3]
+    else:
+        tags = None
+
+    index = Index(dirpath)
+
+    # get all entries in the directory w/ stats
+    entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
+    entries = ((os.stat(path), path) for path in entries)
+    entries = list(entries)
+    entries.sort()
+
+    for mdate, path in sorted(entries):
+        root, ext = os.path.splitext(path)
+        if ext.lower() not in [".jpg", ".jpeg"]:
+            # Only consider images
+            continue
+
+        # XXX: Currently Tumblr does not have separate title and description
+        # for photos.. only for text posts
+        title, desc = get_photo_title_and_description(path)
+
+        if description_prefix:
+            desc = u"<em>%s.</em> %s" % (description_prefix, desc)
+
+        if not index.is_already_posted(path):
+            print "Posting %s: %s" % (path.encode("utf-8"), desc.encode("utf-8"))
+            response = tumblr.create_photo_post(path, request_params={"caption": desc, "tags": tags})
+            response = json.loads(response)
+            if response["meta"]["status"] != 201:
+                print response
+                raise RuntimeError("Tumbrl unsuccesful")
+
+            tumblr_id = response["response"]["id"]
+            index.update(path, tumblr_id)
+            index.save()
+        else:
+            print "Already posted %s" % path.encode("utf-8")
 
 
-
+if __name__ == "__main__":
+    main()

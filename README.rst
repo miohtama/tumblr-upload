@@ -10,8 +10,8 @@ Use JPEG EXIF and IPTC (Google Picasa) metadata description as post title or pos
 It uses `Natural Language Toolkit <http://www.nltk.org/>`_ for extracting sentences and stuff.
 
 
-Usage
-------
+Installation
+--------------
 
 
 Install::
@@ -48,13 +48,32 @@ bar and give it the script asking for it::
 Now ``authorize.py`` generates upload.sh script which has your Tumbrl
 credentials stored permanently.
 
-Now you can upload a folderful of photos::
+Usage
+--------------
+
+You call the script with arguments:
+
+    upload.sh [folder] [prefix text] [tags]
+
+Where
+
+* *folder* is the folder of which all files will be uploaded. Duplicate uploads are avoided by using a tracking file
+
+* *prefix text* is inserted at the beginning of each photo description
+
+* *tags* is a comma separated list of Tumblr tags you want to assing on the photo
+
+After installation you can upload a folderful of photos::
 
     ./upload.sh ~/Desktop/sushinight/Sao\ Paulo\ highlights\ 2/
 
 You can also add some prefix text to all photo captions::
 
     ./upload.sh ~/Desktop/sushinight/copacabana "RIO DE JANEIRO"
+
+And then with tags::
+
+    ./upload.sh ~/Desktop/sushinight/copacabana "RIO DE JANEIRO" "brazil, riodejaneiro"
 
 Troubleshooting
 ------------------

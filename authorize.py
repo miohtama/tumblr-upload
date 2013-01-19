@@ -37,6 +37,7 @@ out = open("upload.sh", "wt")
 
 pwd = os.getcwd()
 
+# http://wiki.bash-hackers.org/scripting/posparams
 print >> out, """#!/bin/sh
 . %s/venv/bin/activate
 BLOG=%s \\
@@ -44,7 +45,7 @@ KEY=%s \\
 SECRET=%s \\
 TOKEN=%s \\
 VERIFIER=%s \\
-python %s/tumblr-upload.py $*
+python %s/tumblr-upload.py "$@"
 """ % (pwd, os.environ["BLOG"], os.environ["KEY"], os.environ["SECRET"], final_oauth_token, final_oauth_token_secret, pwd)
 
 out.close()
