@@ -16,7 +16,7 @@ Installation
 Install::
 
     git clone git://github.com/miohtama/tumblr-upload.git
-    cd tumbrl-upload
+    cd tumblr-upload
     sudo pip install virtualenv
     virtualenv venv
     . venv/bin/activate
