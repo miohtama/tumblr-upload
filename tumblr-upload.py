@@ -165,9 +165,9 @@ def main():
     entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
     entries = ((os.stat(path), path) for path in entries)
     entries = list(entries)
-    entries.sort()
-
-    for mdate, path in sorted(entries):
+    
+    # For sorting keys see os.stat https://docs.python.org/2/library/os.html#os.stat
+    for stats, path in sorted(entries, key=lambda entry: entry[0].st_mtime):
         root, ext = os.path.splitext(path)
         if ext.lower() not in [".jpg", ".jpeg"]:
             # Only consider images
