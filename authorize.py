@@ -1,6 +1,6 @@
-    """
+"""
 
-    Create command line authorization token.
+Create command line authorization token.
 
 """
 import os
