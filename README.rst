@@ -85,6 +85,8 @@ Troubleshooting
 If you get 401 responses from Tumblr OAuth API your clock might be wrong time and
 timestamp check fails.
 
+Tumblr scales down images larger than 1280px wide, to 1280px wide.
+
 Internals
 ---------
 
