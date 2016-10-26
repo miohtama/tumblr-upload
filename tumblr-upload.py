@@ -89,10 +89,12 @@ def get_photo_title_and_description(path):
 
 
     """
-    info = IPTCInfo(path)
-
-    title = os.path.basename(path)
-    desc = info.data['caption/abstract']
+    try:
+        info = IPTCInfo(path)
+        title = os.path.basename(path)
+        desc = info.data['caption/abstract']
+    except:
+        desc = False
 
     if not desc:
         # No metadata
