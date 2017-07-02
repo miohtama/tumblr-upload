@@ -87,6 +87,24 @@ timestamp check fails.
 
 Tumblr scales down images larger than 1280px wide, to 1280px wide.
 
+If you get the error `UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 50: ordinal not in range(128)`,
+one of your filenames contains unicode characters that cannot be processed by the script. Try renaming
+those files to ASCII characters only. Such filenames can be found with `LC_ALL=C find . -name '*[! -~]*'`
+
+If you get the error `Resource u'tokenizers/punkt/english.pickle' not found`, replace
+
+```python
+if not os.path.exists(os.path.join(os.environ["HOME"], "nltk_data")):
+    nltk.download('punkt')
+```
+
+with
+
+```python
+#if not os.path.exists(os.path.join(os.environ["HOME"], "nltk_data")):
+nltk.download('punkt')
+```
+
 Internals
 ---------
 
